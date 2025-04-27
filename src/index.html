@@ -1,0 +1,392 @@
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>Obscure Map Converter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #333;
+    background-color: #f8f9fa;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  .app-description {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .container {
+    display: flex;
+    gap: 20px;
+  }
+  .input-panel, .output-panel {
+    flex: 1;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .panel-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #2980b9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-info {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+  }
+  .button-container {
+    margin: 15px 0;
+    text-align: center;
+  }
+  button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+  .file-container {
+    margin-bottom: 15px;
+  }
+  .file-name {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+  }
+  .status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .visualization {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  #mapVisualization {
+    font-family: monospace;
+    white-space: pre;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  .toggle-btn {
+    background-color: #6c757d;
+    margin-top: 10px;
+  }
+  .hidden {
+    display: none;
+  }
+  .info-icon {
+    cursor: help;
+    color: #6c757d;
+    margin-left: 5px;
+  }
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 240px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -120px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+    font-weight: normal;
+  }
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  .tabs {
+    display: flex;
+    margin-bottom: 15px;
+  }
+  .tab {
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+  }
+  .tab.active {
+    background-color: #fff;
+    border-bottom: 2px solid #fff;
+    margin-bottom: -2px;
+    font-weight: bold;
+  }
+  .tab-content {
+    border: 1px solid #dee2e6;
+    border-radius: 0 5px 5px 5px;
+    padding: 15px;
+    background-color: #fff;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid #dee2e6;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f8f9fa;
+  } 
+.entity-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 3px;
+    margin-right: 5px;
+    font-weight: bold;
+  }
+  .entity-B {
+    background-color: #007bff;
+    color: white;
+  }
+  .entity-M {
+    background-color: #28a745;
+    color: white;
+  }
+  .entity-I {
+    background-color: #fd7e14;
+    color: white;
+  }
+  .entity-F {
+    background-color: #6f42c1;
+    color: white;
+  }
+  .entity-C {
+    background-color: #e83e8c;
+    color: white;
+  }
+  .entity-D {
+    background-color: #17a2b8;
+    color: white;
+  }
+  .entity-E {
+    background-color: #20c997;
+    color: white;
+  }
+  .entity-G {
+    background-color: #ffc107;
+    color: black;
+  }
+  .entity-J {
+    background-color: #dc3545;
+    color: white;
+  }
+  .map-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: #17a2b8;
+    color: white;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .entity-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .entity-stat {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    min-width: 100px;
+    text-align: center;
+  }
+  .stat-count {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .connection-bar {
+    position: absolute;
+    bottom: 0;
+    width: 40px;
+    background-color: #007bff;
+    transition: height 0.3s;
+  }
+  .connection-label {
+    position: absolute;
+    bottom: -25px;
+    width: 40px;
+    text-align: center;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<h1>Obscure 1 Map Converter</h1>
+
+<div class="app-description">
+  <p>This tool converts binary game map files from Obscure 1 into structured JSON format. It supports multiple entity types:</p>
+  <ul>
+    <li><span class="entity-icon entity-B">B</span> - Block/Building entities (level geometry)</li>
+    <li><span class="entity-icon entity-C">C</span> - Character/NPC entities (game characters)</li>
+    <li><span class="entity-icon entity-D">D</span> - Dialog/Data entities (conversation trees)</li>
+    <li><span class="entity-icon entity-E">E</span> - Environment/Area entities (map regions)</li>
+    <li><span class="entity-icon entity-F">F</span> - Function/Feature entities (game logic)</li>
+    <li><span class="entity-icon entity-G">G</span> - Gameplay/Goal entities (objectives, triggers)</li>
+    <li><span class="entity-icon entity-I">I</span> - Item/Interaction entities (collectibles, pickups)</li>
+    <li><span class="entity-icon entity-J">J</span> - Junction/Journey entities (pathways, transitions)</li>
+    <li><span class="entity-icon entity-M">M</span> - Mission/Marker entities (objectives)</li>
+  </ul>
+  <p>The converter automatically detects the map format, interprets coordinates, and identifies connections between entities.</p>
+</div> 
+
+<div class="container">
+  <div class="input-panel">
+    <div class="panel-header">
+      Input Map File
+      <div class="tooltip">
+        <span class="info-icon">ⓘ</span>
+        <span class="tooltiptext">Upload a .map file or paste the content here.</span>
+      </div>
+    </div>
+    <div class="file-container">
+      <input type="file" id="mapFileInput" accept=".map">
+      <div id="fileName" class="file-name"></div>
+    </div>
+    <div>
+      <textarea id="mapContentInput" placeholder="Or paste your map file content here..."></textarea>
+    </div>
+    <div class="button-container">
+      <button id="convertBtn">Convert to JSON</button>
+      <button id="analyzeBtn">Analyze Only</button>
+    </div>
+    <div id="statusMessage" class="status hidden"></div>
+  </div>
+  
+  <div class="output-panel">
+    <div class="tabs">
+      <div class="tab active" data-tab="json">JSON Output</div>
+      <div class="tab" data-tab="analysis">File Analysis</div>
+      <div class="tab" data-tab="entities">Entity Details</div>
+    </div>
+    
+    <div class="tab-content" id="jsonTab">
+      <div class="panel-info">Converted map data in JSON format.</div>
+      <textarea id="jsonOutput" readonly placeholder="JSON output will appear here..."></textarea>
+      <div class="button-container">
+        <button id="downloadBtn" disabled>Download JSON</button>
+        <button id="copyBtn">Copy to Clipboard</button>
+      </div>
+    </div>
+    
+    <div class="tab-content hidden" id="analysisTab">
+      <div class="panel-info">Detailed analysis of the map structure.</div>
+      <div id="mapStats"></div>
+      <div class="entity-stats">
+        <div class="entity-stat">
+          <div class="stat-count" id="entityCount">0</div>
+          <div>Entities</div>
+        </div>
+        <div class="entity-stat">
+          <div class="stat-count" id="connectionCount">0</div>
+          <div>Connections</div>
+        </div>
+      </div>
+      
+      <h3>Entity Type Distribution</h3>
+      <div id="entityTypeStats"></div>
+      
+      <h3>Connection Patterns</h3>
+      <div id="connectionPatterns"></div>
+    </div>
+    
+    <div class="tab-content hidden" id="entitiesTab">
+      <div class="panel-info">List of all entities in the map.</div>
+      <table id="entityTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Subtype</th>
+            <th>Position</th>
+            <th>Connections</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="visualization hidden" id="visualizationContainer">
+  <div class="panel-header">Map Visualization</div>
+  <div id="mapVisualization"></div>
+</div>
+
+<div class="button-container">
+  <button id="toggleVisualizeBtn" class="toggle-btn">Show Visualization</button>
+</div>
+
+<script src="./parser.js"></script>
+</body>
